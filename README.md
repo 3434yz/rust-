@@ -1,5 +1,3 @@
-# rust-study
-
 # rust-lang学习
 
 # 每个阶段的学习目标
