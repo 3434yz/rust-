@@ -1,10 +1,4 @@
-use std::mem;
-
-#[derive(Debug)]
-enum Link {
-    Empty,
-    More(Box<Node>),
-}
+type Link = Option<Box<Node>>;
 
 #[derive(Debug)]
 struct Node {
@@ -19,56 +13,38 @@ struct List {
 
 impl List {
     fn new() -> Self {
-        List { head: Link::Empty }
+        List { head: None }
     }
 
     fn push(&mut self, elem: i32) {
-        let box_node = Link::More(Box::new(Node {
+        let new_node = Box::new(Node {
             elem,
-            next: mem::replace(&mut self.head, Link::Empty),
-        }));
+            next: self.head.take(),
+        });
 
-        self.head = box_node
+        self.head = Some(new_node);
     }
 
     fn pop(&mut self) -> Option<i32> {
-        let result;
-        match mem::replace(&mut self.head, Link::Empty) {
-            Link::More(node) => {
-                self.head = node.next;
-                result = Some(node.elem);
-            }
-            Link::Empty => {
-                result = None;
-            }
-        }
-        result
+        self.head.take().map(|node| {
+            self.head = node.next;
+            node.elem
+        })
     }
 }
 
 impl Drop for List {
-    // add code here
     fn drop(&mut self) {
-        let mut cur_link = mem::replace(&mut self.head, Link::Empty);
-        // while let Link::More(mut box_node) = cur_link {
-        //     cur_link = mem::replace(&mut box_node.next,Link::Empty);
-        // }
-        loop {
-            match cur_link {
-                Link::More(mut box_node) => {
-                    cur_link = mem::replace(&mut box_node.next, Link::Empty);
-                }
-                Link::Empty => {
-                    break;
-                }
-            }
+        let mut cur_link = self.head.take();
+        while let Some(mut box_node) = cur_link {
+            cur_link = box_node.next.take();
         }
     }
 }
 
 #[cfg(test)]
 mod test {
-    use crate::first::List;
+    use crate::second::List;
 
     #[test]
     fn basics() {
