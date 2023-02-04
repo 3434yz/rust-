@@ -32,17 +32,13 @@ impl List {
     }
 
     fn pop(&mut self) -> Option<i32> {
-        let result;
         match mem::replace(&mut self.head, Link::Empty) {
             Link::More(node) => {
                 self.head = node.next;
-                result = Some(node.elem);
+                Some(node.elem)
             }
-            Link::Empty => {
-                result = None;
-            }
+            Link::Empty => None,
         }
-        result
     }
 }
 
