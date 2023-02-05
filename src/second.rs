@@ -25,6 +25,16 @@ impl List {
         self.head = Some(new_node);
     }
 
+    // fn pop(&mut self) -> Option<i32> {
+    //     match self.head.take() {
+    //         None => None,
+    //         Some(node) => {
+    //             self.head = node.next;
+    //             Some(node.elem)
+    //         }
+    //     }
+    // }
+
     fn pop(&mut self) -> Option<i32> {
         self.head.take().map(|node| {
             self.head = node.next;
