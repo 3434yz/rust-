@@ -1,41 +1,38 @@
-type Link = Option<Box<Node>>;
-
 #[derive(Debug)]
-struct Node {
-    elem: i32,
-    next: Link,
+struct Node<T> {
+    elem: T,
+    next: Link<T>,
 }
 
 #[derive(Debug)]
-struct List {
-    head: Link,
+struct List<T> {
+    head: Link<T>,
 }
 
-impl List {
+type Link<T> = Option<Box<Node<T>>>;
+
+impl<T> List<T> {
     fn new() -> Self {
         List { head: None }
     }
 
-    fn push(&mut self, elem: i32) {
-        let new_node = Box::new(Node {
+    fn push(&mut self, elem: T) {
+        let new_node = Some(Box::new(Node {
             elem,
             next: self.head.take(),
-        });
-
-        self.head = Some(new_node);
+        }));
+        self.head = new_node;
     }
 
-    // fn pop(&mut self) -> Option<i32> {
-    //     match self.head.take() {
-    //         None => None,
-    //         Some(node) => {
-    //             self.head = node.next;
-    //             Some(node.elem)
-    //         }
-    //     }
-    // }
+    fn pop(&mut self) -> Option<T> {
+        // match self.head.take() {
+        //     None => None,
+        //     Some(node) => {
+        //         self.head = node.next;
+        //         Some(node.elem)
+        //     }
+        // }
 
-    fn pop(&mut self) -> Option<i32> {
         self.head.take().map(|node| {
             self.head = node.next;
             node.elem
@@ -43,11 +40,11 @@ impl List {
     }
 }
 
-impl Drop for List {
+impl<T> Drop for List<T> {
     fn drop(&mut self) {
         let mut cur_link = self.head.take();
-        while let Some(mut box_node) = cur_link {
-            cur_link = box_node.next.take();
+        while let Some(mut boxed_node) = cur_link {
+            cur_link = boxed_node.next.take();
         }
     }
 }
@@ -80,7 +77,7 @@ mod test {
         // assert_eq!(list.pop(), Some(5));
         // assert_eq!(list.pop(), Some(4));
 
-        // // Check exhaustion
+        // Check exhaustion
         // assert_eq!(list.pop(), Some(1));
         // assert_eq!(list.pop(), None);
     }
