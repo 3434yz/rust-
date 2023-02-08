@@ -11,6 +11,23 @@ struct List<T> {
 
 type Link<T> = Option<Box<Node<T>>>;
 
+
+// wrapper
+pub struct IntoIter<T>(List<T>);
+
+impl<T> List<T> {
+    pub fn into_iter(self) -> IntoIter<T> {
+        IntoIter(self)
+    }
+}
+
+impl<T> Iterator for IntoIter<T> {
+    type Item = T;
+    fn next(&mut self) ->Option<Self::Item> {
+        self.0.pop()
+    }
+}
+
 impl<T> List<T> {
     fn new() -> Self {
         List { head: None }
